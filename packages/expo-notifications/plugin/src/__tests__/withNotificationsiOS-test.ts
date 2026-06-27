@@ -3,7 +3,11 @@ import { fs, vol } from 'memfs';
 import * as path from 'path';
 
 import { getDirFromFS } from './withNotificationsAndroid-test';
-import { setNotificationSounds } from '../withNotificationsIOS';
+import {
+  APP_NOTIFICATION_SETTINGS_ROUTE_KEY,
+  setNotificationSounds,
+  withNotificationsIOS,
+} from '../withNotificationsIOS';
 
 jest.mock('fs');
 
@@ -52,5 +56,34 @@ describe('iOS notifications configuration', () => {
 
     const after = getDirFromFS(vol.toJSON(), projectRoot);
     expect(Object.keys(after).sort()).toEqual(LIST_OF_GENERATED_FILES.sort());
+  });
+});
+
+describe('withNotificationsIOS settingsRoute', () => {
+  const baseConfig = { name: 'testproject', slug: 'testproject' } as any;
+
+  async function runInfoPlistMod(props: Parameters<typeof withNotificationsIOS>[1]) {
+    const config = withNotificationsIOS({ ...baseConfig }, props);
+    const result = await (config.mods!.ios!.infoPlist as any)({ modResults: {} });
+    return result.modResults;
+  }
+
+  it('sets the settings route Info.plist key when settingsRoute is provided', async () => {
+    const modResults = await runInfoPlistMod({ settingsRoute: '/settings/notifications' });
+    expect(modResults[APP_NOTIFICATION_SETTINGS_ROUTE_KEY]).toBe('/settings/notifications');
+  });
+
+  it('does not register an Info.plist mod when settingsRoute is omitted', () => {
+    const config = withNotificationsIOS({ ...baseConfig }, {});
+    expect(config.mods?.ios?.infoPlist).toBeUndefined();
+  });
+
+  it('throws when settingsRoute is not a non-empty string', () => {
+    expect(() => withNotificationsIOS({ ...baseConfig }, { settingsRoute: '' })).toThrow(
+      /settingsRoute/
+    );
+    expect(() => withNotificationsIOS({ ...baseConfig }, { settingsRoute: 123 as any })).toThrow(
+      /settingsRoute/
+    );
   });
 });

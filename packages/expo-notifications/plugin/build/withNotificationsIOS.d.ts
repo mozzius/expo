@@ -1,5 +1,6 @@
 import { ConfigPlugin, XcodeProject } from 'expo/config-plugins';
 import { NotificationsPluginProps } from './withNotifications';
+export declare const APP_NOTIFICATION_SETTINGS_ROUTE_KEY = "EXNotificationsAppSettingsRoute";
 export declare const withNotificationsIOS: ConfigPlugin<NotificationsPluginProps>;
 /**
  * Save sound files to the Xcode project root and add them to the Xcode project.

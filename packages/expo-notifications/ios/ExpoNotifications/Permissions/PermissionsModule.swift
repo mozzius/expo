@@ -28,9 +28,14 @@ public class PermissionsModule: Module {
 
     AsyncFunction("requestPermissionsAsync") { (requestedPermissions: NotificationPermissionRecord, promise: Promise) in
       let defaultAuthorizationOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-      let options = requestedPermissions.numberOfOptionsRequested() > 0
+      var options = requestedPermissions.numberOfOptionsRequested() > 0
         ? requestedPermissions.authorizationOptionValue()
         : defaultAuthorizationOptions
+      // When a settings route is configured via the config plugin, always advertise the
+      // in-app notification settings link so iOS shows it in the system Settings app.
+      if Bundle.main.object(forInfoDictionaryKey: "EXNotificationsAppSettingsRoute") != nil {
+        options.insert(.providesAppNotificationSettings)
+      }
       requester.setAuthorizationOptions(options)
 
       // Call `requestAuthorization` directly to ensure new options are always

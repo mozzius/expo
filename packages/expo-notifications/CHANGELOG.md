@@ -6,6 +6,8 @@
 
 ### 🎉 New features
 
+- [ios] Added `settingsRoute` config plugin prop that enables `providesAppNotificationSettings` and deep links to the given route when the user taps the in-app notification settings link in iOS Settings. ([#PR](https://github.com/expo/expo/pull/PR) by [@mozzius](https://github.com/mozzius))
+
 ### 🐛 Bug fixes
 
 - [ios] Fixed `requestPermissionsAsync` returning raw permission result without several documented fields ([#43555](https://github.com/expo/expo/pull/43555) by [@vonovak](https://github.com/vonovak))

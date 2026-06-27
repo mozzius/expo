@@ -36,6 +36,17 @@ export type NotificationsPluginProps = {
      * @platform ios
      */
     enableBackgroundRemoteNotifications?: boolean;
+    /**
+     * A route to deep link to when the user taps the in-app "Notification Settings" link that
+     * iOS shows for your app in the system Settings app. Setting this enables iOS
+     * `providesAppNotificationSettings`, so the link is displayed after the user is asked for
+     * notification permissions.
+     *
+     * The route is opened as a deep link using your app's URL scheme, so a `scheme` must be set
+     * in your app config for this to work.
+     * @platform ios
+     */
+    settingsRoute?: string;
 };
 declare const _default: ConfigPlugin<void | NotificationsPluginProps>;
 export default _default;

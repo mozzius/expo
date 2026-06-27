@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.withNotificationsIOS = void 0;
+exports.withNotificationsIOS = exports.APP_NOTIFICATION_SETTINGS_ROUTE_KEY = void 0;
 exports.setNotificationSounds = setNotificationSounds;
 const config_plugins_1 = require("expo/config-plugins");
 const fs_1 = require("fs");
 const path_1 = require("path");
 const ERROR_MSG_PREFIX = 'An error occurred while configuring iOS notifications. ';
-const withNotificationsIOS = (config, { mode = 'development', sounds = [], enableBackgroundRemoteNotifications }) => {
+exports.APP_NOTIFICATION_SETTINGS_ROUTE_KEY = 'EXNotificationsAppSettingsRoute';
+const withNotificationsIOS = (config, { mode = 'development', sounds = [], enableBackgroundRemoteNotifications, settingsRoute }) => {
     config = (0, config_plugins_1.withEntitlementsPlist)(config, (config) => {
         if (!config.modResults['aps-environment']) {
             config.modResults['aps-environment'] = mode;
@@ -15,9 +16,23 @@ const withNotificationsIOS = (config, { mode = 'development', sounds = [], enabl
     });
     config = withNotificationSounds(config, { sounds });
     config = withBackgroundRemoteNotifications(config, enableBackgroundRemoteNotifications);
+    config = withAppNotificationSettingsRoute(config, settingsRoute);
     return config;
 };
 exports.withNotificationsIOS = withNotificationsIOS;
+const withAppNotificationSettingsRoute = (config, settingsRoute) => {
+    if (settingsRoute === undefined) {
+        return config;
+    }
+    if (typeof settingsRoute !== 'string' || settingsRoute.length === 0) {
+        throw new Error(ERROR_MSG_PREFIX +
+            `"settingsRoute" has an invalid value: ${settingsRoute}. Expected a non-empty string.`);
+    }
+    return (0, config_plugins_1.withInfoPlist)(config, (config) => {
+        config.modResults[exports.APP_NOTIFICATION_SETTINGS_ROUTE_KEY] = settingsRoute;
+        return config;
+    });
+};
 const withBackgroundRemoteNotifications = (config, enableBackgroundRemoteNotifications) => {
     if (!(enableBackgroundRemoteNotifications === undefined ||
         typeof enableBackgroundRemoteNotifications === 'boolean')) {

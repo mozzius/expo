@@ -13,9 +13,11 @@ import { NotificationsPluginProps } from './withNotifications';
 
 const ERROR_MSG_PREFIX = 'An error occurred while configuring iOS notifications. ';
 
+export const APP_NOTIFICATION_SETTINGS_ROUTE_KEY = 'EXNotificationsAppSettingsRoute';
+
 export const withNotificationsIOS: ConfigPlugin<NotificationsPluginProps> = (
   config,
-  { mode = 'development', sounds = [], enableBackgroundRemoteNotifications }
+  { mode = 'development', sounds = [], enableBackgroundRemoteNotifications, settingsRoute }
 ) => {
   config = withEntitlementsPlist(config, (config) => {
     if (!config.modResults['aps-environment']) {
@@ -25,8 +27,28 @@ export const withNotificationsIOS: ConfigPlugin<NotificationsPluginProps> = (
   });
   config = withNotificationSounds(config, { sounds });
   config = withBackgroundRemoteNotifications(config, enableBackgroundRemoteNotifications);
+  config = withAppNotificationSettingsRoute(config, settingsRoute);
 
   return config;
+};
+
+const withAppNotificationSettingsRoute: ConfigPlugin<string | undefined> = (
+  config,
+  settingsRoute
+) => {
+  if (settingsRoute === undefined) {
+    return config;
+  }
+  if (typeof settingsRoute !== 'string' || settingsRoute.length === 0) {
+    throw new Error(
+      ERROR_MSG_PREFIX +
+        `"settingsRoute" has an invalid value: ${settingsRoute}. Expected a non-empty string.`
+    );
+  }
+  return withInfoPlist(config, (config) => {
+    config.modResults[APP_NOTIFICATION_SETTINGS_ROUTE_KEY] = settingsRoute;
+    return config;
+  });
 };
 
 const withBackgroundRemoteNotifications: ConfigPlugin<boolean | undefined> = (
